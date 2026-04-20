@@ -670,6 +670,13 @@ function toggleShapeVisible(id: string) {
   }
 }
 
+function toggleGroupVisible(group: ShapeGroup) {
+  // If all visible → hide all; otherwise show all
+  const allVisible = group.shapes.every((s) => s.visible);
+  for (const s of group.shapes) s.visible = !allVisible;
+  shapesVersion.value++;
+}
+
 function exportSvg() {
   if (!svgSource.value || shapes.length === 0) return;
 
@@ -789,6 +796,7 @@ export const useFfitoStore = () => ({
   resetSelectedHatch,
   toggleSelectedHatch,
   toggleShapeVisible,
+  toggleGroupVisible,
   exportSvg,
   // layer actions
   addLayer,

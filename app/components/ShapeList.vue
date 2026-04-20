@@ -103,6 +103,14 @@ function isPartial(g: ShapeGroup): boolean {
 function hasMerges(g: ShapeGroup): boolean {
   return g.swatches.length > 1;
 }
+
+function groupAllVisible(g: ShapeGroup): boolean {
+  return g.shapes.every((s) => s.visible);
+}
+
+function groupAnyVisible(g: ShapeGroup): boolean {
+  return g.shapes.some((s) => s.visible);
+}
 </script>
 
 <template>
@@ -179,7 +187,7 @@ function hasMerges(g: ShapeGroup): boolean {
       <!-- ── Group header ──────────────────────────────────────── -->
       <div
         v-if="store.groupBy.value !== 'flat'"
-        class="relative flex items-center gap-1.5 px-1.5 h-[24px] rounded-lg transition-all duration-200 select-none"
+        class="group/header relative flex items-center gap-1.5 px-1.5 h-[24px] rounded-lg transition-all duration-200 select-none"
         :class="[
           // Selection state
           isFull(group)
@@ -253,6 +261,19 @@ function hasMerges(g: ShapeGroup): boolean {
           @click.stop="store.unmergeColorGroup(colorFromKey(group.key))"
         >
           <i class="i-mdi-call-split text-xs" />
+        </button>
+
+        <!-- Visibility toggle -->
+        <button
+          class="shrink-0 p-0.5 rounded transition-all duration-150 cursor-pointer
+                 opacity-0 group-hover/header:opacity-100"
+          :class="groupAllVisible(group)
+            ? 'text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-secondary))]'
+            : 'text-[rgb(var(--accent))] opacity-100'"
+          :title="groupAllVisible(group) ? 'Hide group' : 'Show group'"
+          @click.stop="store.toggleGroupVisible(group)"
+        >
+          <i :class="groupAllVisible(group) ? 'i-mdi-eye-outline' : 'i-mdi-eye-off-outline'" class="text-xs" />
         </button>
 
         <!-- Count badge -->
