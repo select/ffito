@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * HatchPanel — right-dock panel for configuring hatch fill.
+ * HatchPanel - right-dock panel for configuring hatch fill.
  * Dynamic layer system: add/remove/configure individual hatch layers.
  */
 import { LAYER_PRESETS } from "~/composables/useFfitoStore";
@@ -53,24 +53,7 @@ function toggleLayerCollapsed(idx: number) {
       </Transition>
     </div>
 
-    <!-- ── Enable toggle ──────────────────────────────────────── -->
-    <div class="clay-card !p-3 flex items-center justify-between">
-      <span class="text-xs text-[rgb(var(--text-primary))] font-medium">Enable</span>
-      <button
-        class="clay-switch"
-        :class="hatch.enabled
-          ? 'bg-[rgb(var(--accent))] shadow-[0_2px_8px_rgb(var(--accent-glow)),inset_0_1px_0_rgba(255,255,255,0.1)]'
-          : 'bg-[rgb(var(--bg-well))] shadow-[inset_0_2px_4px_rgb(var(--clay-inset)),0_0.5px_0_rgb(var(--clay-light))]'"
-        @click="set({ enabled: !hatch.enabled })"
-      >
-        <span
-          class="absolute top-[3px] w-4 h-4 rounded-full transition-all duration-250"
-          :class="hatch.enabled
-            ? 'left-[21px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)]'
-            : 'left-[3px] bg-[rgb(var(--bg-elevated))] shadow-[0_1px_3px_rgb(var(--clay-dark)),inset_0_1px_0_rgb(var(--clay-light))]'"
-        />
-      </button>
-    </div>
+    <!-- ── Enable toggle removed — moved into Line card as "Hatch fill" -->
 
     <!-- ── Presets (quick layer sets) ─────────────────────────── -->
     <div class="clay-card space-y-2.5">
@@ -123,6 +106,28 @@ function toggleLayerCollapsed(idx: number) {
           <span
             class="absolute top-[3px] w-4 h-4 rounded-full transition-all duration-250"
             :class="hatch.strokePath
+              ? 'left-[21px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)]'
+              : 'left-[3px] bg-[rgb(var(--bg-elevated))] shadow-[0_1px_3px_rgb(var(--clay-dark)),inset_0_1px_0_rgb(var(--clay-light))]'"
+          />
+        </button>
+      </div>
+
+      <!-- Hatch fill toggle -->
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex flex-col">
+          <span class="text-[11px] text-[rgb(var(--text-secondary))] font-medium">Hatch fill</span>
+          <span class="text-[9px] text-[rgb(var(--text-muted))]">Fill shape with hatch lines</span>
+        </div>
+        <button
+          class="clay-switch shrink-0"
+          :class="hatch.enabled
+            ? 'bg-[rgb(var(--accent))] shadow-[0_2px_8px_rgb(var(--accent-glow)),inset_0_1px_0_rgba(255,255,255,0.1)]'
+            : 'bg-[rgb(var(--bg-well))] shadow-[inset_0_2px_4px_rgb(var(--clay-inset)),0_0.5px_0_rgb(var(--clay-light))]'"
+          @click="set({ enabled: !hatch.enabled })"
+        >
+          <span
+            class="absolute top-[3px] w-4 h-4 rounded-full transition-all duration-250"
+            :class="hatch.enabled
               ? 'left-[21px] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.3)]'
               : 'left-[3px] bg-[rgb(var(--bg-elevated))] shadow-[0_1px_3px_rgb(var(--clay-dark)),inset_0_1px_0_rgb(var(--clay-light))]'"
           />
