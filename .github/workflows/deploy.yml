@@ -33,6 +33,8 @@ jobs:
 
       - name: Generate static site
         run: pnpm generate
+        env:
+          GITHUB_PAGES: "true"
 
       - uses: actions/upload-pages-artifact@v3
         with:
