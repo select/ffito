@@ -18,9 +18,10 @@ onMounted(async () => {
   const params = new URLSearchParams(window.location.search);
   const devParam = params.get('dev');
   if (devParam === null && !params.has('dev')) return;
+  const base = useRuntimeConfig().app.baseURL.replace(/\/$/, '');
   const url = devParam && devParam.startsWith('http')
     ? devParam
-    : `${window.location.origin}${import.meta.env.BASE_URL}test.svg`;
+    : `${window.location.origin}${base}/test.svg`;
   try {
     const resp = await fetch(url);
     if (resp.ok) store.loadSvgText(await resp.text());
