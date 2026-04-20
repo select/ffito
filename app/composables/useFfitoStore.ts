@@ -147,6 +147,10 @@ export interface ShapeGroup {
 
 const toolMode = ref<ToolMode>("select");
 const viewMode = ref<ViewMode>("hatch");
+
+// Canvas navigation settings
+const panSpeed = ref(1.0);
+const zoomFactor = ref(1.12);
 const groupBy = ref<GroupBy>("flat");
 const svgSource = ref<string | null>(null);
 const svgViewBox = ref({ x: 0, y: 0, w: 800, h: 600 });
@@ -755,6 +759,8 @@ function exportSvg() {
 export const useFfitoStore = () => ({
   toolMode,
   viewMode,
+  panSpeed,
+  zoomFactor,
   groupBy,
   svgSource,
   svgViewBox,

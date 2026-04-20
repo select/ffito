@@ -137,8 +137,33 @@ const selCount = computed(() => store.selectedIds.value.size);
     </Transition>
 
     <!-- ── Shape count (far right) ────────────────────────────── -->
-    <div v-if="hasShapes" class="ml-auto">
-      <span class="clay-pill tabular-nums">
+    <!-- Navigation speeds + shape count -->
+    <div class="ml-auto flex items-center gap-2">
+      <div class="clay-toolbar flex items-center gap-2 px-2.5">
+        <i class="i-mdi-navigation-variant-outline text-xs text-[rgb(var(--text-muted))]" />
+        <div class="flex items-center gap-1.5">
+          <span class="text-[9px] text-[rgb(var(--text-muted))] uppercase tracking-wide">Zoom</span>
+          <input
+            type="range" min="1.03" max="1.35" step="0.01"
+            :value="store.zoomFactor.value"
+            class="w-16 h-1 rounded-full accent-[rgb(var(--accent))] cursor-pointer"
+            @input="store.zoomFactor.value = parseFloat(($event.target as HTMLInputElement).value)"
+          />
+          <span class="text-[9px] font-mono text-[rgb(var(--accent))] tabular-nums w-7">{{ store.zoomFactor.value.toFixed(2) }}x</span>
+        </div>
+        <div class="w-px h-3 bg-[rgb(var(--border))]" />
+        <div class="flex items-center gap-1.5">
+          <span class="text-[9px] text-[rgb(var(--text-muted))] uppercase tracking-wide">Pan</span>
+          <input
+            type="range" min="0.2" max="3" step="0.1"
+            :value="store.panSpeed.value"
+            class="w-16 h-1 rounded-full accent-[rgb(var(--accent))] cursor-pointer"
+            @input="store.panSpeed.value = parseFloat(($event.target as HTMLInputElement).value)"
+          />
+          <span class="text-[9px] font-mono text-[rgb(var(--accent))] tabular-nums w-7">{{ store.panSpeed.value.toFixed(1) }}x</span>
+        </div>
+      </div>
+      <span v-if="hasShapes" class="clay-pill tabular-nums">
         {{ store.shapes.length }} shapes
       </span>
     </div>

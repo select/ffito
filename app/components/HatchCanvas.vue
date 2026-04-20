@@ -15,8 +15,11 @@ import type { SvgShape } from "~/composables/useFfitoStore";
 const store = useFfitoStore();
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
-const { transform, onPointerDown, onPointerMove, onPointerUp, fitToView, canvasToSvg } =
-  useCanvasTransform(canvasRef);
+const { transform, onPointerDown, onPointerMove, onPointerUp, panning, fitToView, canvasToSvg } =
+  useCanvasTransform(canvasRef, {
+    panSpeed: store.panSpeed,
+    zoomFactor: store.zoomFactor,
+  });
 
 // ── Resize handling ───────────────────────────────────────────────────────
 
@@ -301,7 +304,7 @@ function getTestContext(): CanvasRenderingContext2D {
   <canvas
     ref="canvasRef"
     class="w-full h-full block"
-    :style="{ cursor: store.toolMode.value === 'select' ? 'default' : 'crosshair' }"
+    :style="{ cursor: panning() ? 'grabbing' : store.toolMode.value === 'select' ? 'default' : 'crosshair' }"
     @pointerdown="(e) => { onPointerDown(e); onCanvasClick(e); }"
     @pointermove="onPointerMove"
     @pointerup="onPointerUp"
