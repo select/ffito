@@ -1,0 +1,162 @@
+/* Nuxt root container must fill viewport */
+#__nuxt { height: 100%; }
+
+/* ═══════════════════════════════════════════════════════
+   Design tokens — warm dark clay-morphism palette
+   No hard whites/blacks. Soft, low-contrast tones.
+   ═══════════════════════════════════════════════════════ */
+:root {
+  /* Surfaces — warm charcoal progression */
+  --bg-base:      28 27 32;
+  --bg-surface:   36 34 40;
+  --bg-elevated:  46 43 52;
+  --bg-canvas:    22 21 26;
+  --bg-well:      20 19 24;
+
+  /* Clay shadow palette */
+  --clay-dark:    0 0 0 / 0.35;
+  --clay-light:   255 255 255 / 0.04;
+  --clay-inset:   0 0 0 / 0.45;
+
+  /* Borders — almost invisible, just shape definition */
+  --border:       255 255 255 / 0.04;
+  --border-focus: 255 255 255 / 0.08;
+
+  /* Text — desaturated, gentle hierarchy */
+  --text-primary:   210 208 218;
+  --text-secondary: 148 145 160;
+  --text-muted:     88 85 100;
+
+  /* Accent — soft indigo-violet */
+  --accent:       140 110 230;
+  --accent-hover: 160 135 245;
+  --accent-glow:  140 110 230 / 0.12;
+  --accent-soft:  140 110 230 / 0.08;
+
+  /* Misc */
+  --shadow-color: 0 0 0 / 0.5;
+}
+
+html, body {
+  background: rgb(var(--bg-base));
+  color: rgb(var(--text-primary));
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Clay shadow mixins (applied via class in components)
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   Range slider — soft clay thumb
+   ═══════════════════════════════════════════════════════ */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: rgb(var(--bg-well));
+  box-shadow:
+    inset 0 1px 2px rgb(var(--clay-inset)),
+    0 0.5px 0 rgb(var(--clay-light));
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-top: -5px;
+  background: rgb(var(--bg-elevated));
+  border: none;
+  cursor: pointer;
+  box-shadow:
+    0 1px 3px rgb(var(--clay-dark)),
+    0 3px 8px rgb(var(--clay-dark)),
+    inset 0 1px 0 rgb(var(--clay-light));
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  background: rgb(var(--accent));
+  transform: scale(1.15);
+  box-shadow:
+    0 2px 6px rgb(var(--accent-glow)),
+    0 4px 12px rgb(var(--clay-dark)),
+    inset 0 1px 0 rgba(255 255 255 / 0.12);
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.05);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: rgb(var(--bg-well));
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgb(var(--bg-elevated));
+  border: none;
+  cursor: pointer;
+  box-shadow:
+    0 1px 3px rgb(var(--clay-dark)),
+    0 3px 8px rgb(var(--clay-dark)),
+    inset 0 1px 0 rgb(var(--clay-light));
+}
+
+/* ═══════════════════════════════════════════════════════
+   Number input — hide spin buttons
+   ═══════════════════════════════════════════════════════ */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ═══════════════════════════════════════════════════════
+   Color input swatch — soft rounded
+   ═══════════════════════════════════════════════════════ */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 3px; }
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   Scrollbar — whisper thin
+   ═══════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--text-muted) / 0.2);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--text-muted) / 0.35);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Global transitions
+   ═══════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}

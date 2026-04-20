@@ -1,0 +1,31 @@
+{
+  "name": "ffito",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "oxlint --config oxlintrc.json app/",
+    "typecheck": "nuxt typecheck",
+    "check": "oxlint --config oxlintrc.json app/ && nuxt typecheck"
+  },
+  "dependencies": {
+    "@vueuse/core": "14.2.1",
+    "nuxt": "^4.4.2",
+    "vue": "^3.5.32"
+  },
+  "devDependencies": {
+    "@iconify-json/mdi": "1.2.3",
+    "@tsconfig/node20": "20.1.9",
+    "@unocss/nuxt": "66.6.7",
+    "@unocss/reset": "66.6.7",
+    "oxlint": "1.57.0",
+    "typescript": "6.0.2",
+    "unocss": "66.6.7",
+    "vite": "8.0.3",
+    "vue-tsc": "3.2.6"
+  }
+}
