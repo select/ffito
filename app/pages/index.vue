@@ -13,18 +13,18 @@
  */
 const store = useFfitoStore();
 
-// Dev mode: auto-load /public/test.svg when ?dev is in the URL
+// Dev mode: ?dev loads /test.svg, ?dev=<url> fetches from that URL
 onMounted(async () => {
   const params = new URLSearchParams(window.location.search);
-  if (params.has('dev')) {
-    try {
-      const resp = await fetch('/test.svg');
-      if (resp.ok) {
-        const text = await resp.text();
-        store.loadSvgText(text);
-      }
-    } catch { /* ignore — no test.svg available */ }
-  }
+  const devParam = params.get('dev');
+  if (devParam === null && !params.has('dev')) return;
+  const url = devParam && devParam.startsWith('http')
+    ? devParam
+    : `${window.location.origin}${import.meta.env.BASE_URL}test.svg`;
+  try {
+    const resp = await fetch(url);
+    if (resp.ok) store.loadSvgText(await resp.text());
+  } catch { /* ignore */ }
 });
 
 const isDraggingOver = ref(false);
