@@ -4,6 +4,10 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
   compatibilityDate: "2025-05-01",
   ssr: false,
+  nitro: {
+    preset: isGitHubPages ? "github-pages" : undefined,
+  },
+
   devtools: { enabled: false },
 
   app: {
