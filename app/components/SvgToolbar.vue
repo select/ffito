@@ -49,7 +49,7 @@ const selCount = computed(() => store.selectedIds.value.size);
 
       <button
         class="clay-btn"
-        data-tip="Import SVG"
+        data-tip="Open SVG or .ffito.svg"
         @click="store.importSvg()"
       >
         <i class="i-mdi-folder-open-outline text-[17px]" />
@@ -58,7 +58,7 @@ const selCount = computed(() => store.selectedIds.value.size);
       <button
         class="clay-btn transition-opacity duration-250"
         :class="!hasShapes && 'opacity-25 pointer-events-none'"
-        data-tip="Export SVG"
+        data-tip="Save .ffito.svg (embeds settings)"
         @click="store.exportSvg()"
       >
         <i class="i-mdi-download-outline text-[17px]" />

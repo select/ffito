@@ -5,6 +5,9 @@
  * component that calls useFfitoStore() shares the same reactive refs.
  */
 
+import { computeHatchLayers } from "~/utils/hatch";
+import { pathToPolygon } from "~/utils/svgPath";
+
 // ── Tool modes ────────────────────────────────────────────────────────────
 
 export type ToolMode = "select" | "node";
@@ -290,16 +293,74 @@ const groupedShapes = computed<ShapeGroup[]>(() => {
 
 // ── Actions ──────────────────────────────────────────────────────────────
 
+// ── Project serialisation ────────────────────────────────────────────────
+
+interface ShapeOverride {
+  id: string;
+  visible: boolean;
+  hatch: HatchConfig | null;
+}
+
+interface ProjectData {
+  version: 1;
+  svgSource: string;
+  globalHatch: HatchConfig;
+  shapeOverrides: ShapeOverride[];
+  colorMerges: [string, string][];
+  colorGroupOrder: string[];
+}
+
+function exportProject(): ProjectData {
+  return {
+    version: 1,
+    svgSource: svgSource.value ?? "",
+    globalHatch: JSON.parse(JSON.stringify(globalHatch)) as HatchConfig,
+    shapeOverrides: shapes
+      .filter((s) => !s.visible || s.hatch !== null)
+      .map((s) => ({ id: s.id, visible: s.visible, hatch: s.hatch })),
+    colorMerges: [...colorMerges.value.entries()],
+    colorGroupOrder: colorGroupOrder.value,
+  };
+}
+
+function importProject(data: ProjectData) {
+  loadSvgText(data.svgSource);
+  Object.assign(globalHatch, data.globalHatch);
+  const overrideMap = new Map(data.shapeOverrides.map((o) => [o.id, o]));
+  for (const s of shapes) {
+    const ov = overrideMap.get(s.id);
+    if (ov) {
+      s.visible = ov.visible;
+      s.hatch = ov.hatch;
+    }
+  }
+  colorMerges.value = new Map(data.colorMerges);
+  colorGroupOrder.value = data.colorGroupOrder;
+  shapesVersion.value++;
+}
+
 function importSvg() {
   const input = document.createElement("input");
   input.type = "file";
-  input.accept = ".svg,image/svg+xml";
+  input.accept = ".svg,image/svg+xml,.ffito.svg";
   input.onchange = () => {
     const file = input.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      loadSvgText(ev.target?.result as string);
+      const text = ev.target?.result as string;
+      // Check for embedded ffito project data
+      const match = text.match(/<ffito-data>([\s\S]*?)<\/ffito-data>/);
+      if (match) {
+        try {
+          const data = JSON.parse(match[1]!) as ProjectData;
+          if (data.version === 1 && data.svgSource) {
+            importProject(data);
+            return;
+          }
+        } catch { /* fall through to plain SVG load */ }
+      }
+      loadSvgText(text);
     };
     reader.readAsText(file);
   };
@@ -610,9 +671,76 @@ function toggleShapeVisible(id: string) {
 }
 
 function exportSvg() {
-  alert("Export: render to SVG not yet implemented.");
-}
+  if (!svgSource.value || shapes.length === 0) return;
 
+  const vb = svgViewBox.value;
+  const mm = mmToSvg.value;
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg"
+  viewBox="${vb.x} ${vb.y} ${vb.w} ${vb.h}"
+  width="${svgWidthMM.value}mm"
+  height="${(svgWidthMM.value * vb.h / vb.w).toFixed(2)}mm">
+`;
+
+  // Embed project data (escape for XML)
+  const projectJson = JSON.stringify(exportProject())
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  svg += `  <metadata><ffito-data>${projectJson}</ffito-data></metadata>
+`;
+
+  for (const shape of shapes) {
+    if (!shape.visible) continue;
+    const hatch = effectiveHatch(shape);
+
+    svg += `  <g id="${shape.id}">
+`;
+
+    // Shape outline (stroke path)
+    if (hatch.strokePath) {
+      let lineColor = hatch.color;
+      if (hatch.useShapeFill && shape.fill !== "none" && shape.fill !== "") lineColor = shape.fill;
+      const lw = (hatch.lineWidth * mm).toFixed(4);
+      svg += `    <path d="${shape.pathData}" fill="none" stroke="${lineColor}" stroke-width="${lw}" stroke-linecap="round" stroke-linejoin="round"/>
+`;
+    }
+
+    // Hatch lines
+    if (hatch.enabled && hatch.layers.length > 0) {
+      const polygon = pathToPolygon(shape.pathData, 64);
+      if (polygon.length >= 3) {
+        const svgLayers = hatch.layers.map((l) => ({
+          ...l,
+          spacing: l.spacing * mm,
+          borderInset: l.borderInset * mm,
+        }));
+        const segs = computeHatchLayers(polygon, svgLayers);
+        if (segs.length > 0) {
+          let lineColor = hatch.color;
+          if (hatch.useShapeFill && shape.fill !== "none" && shape.fill !== "") lineColor = shape.fill;
+          const lw = (hatch.lineWidth * mm).toFixed(4);
+          const d = segs.map((s) =>
+            `M${s.x1.toFixed(3)},${s.y1.toFixed(3)} L${s.x2.toFixed(3)},${s.y2.toFixed(3)}`
+          ).join(" ");
+          svg += `    <path d="${d}" fill="none" stroke="${lineColor}" stroke-width="${lw}" stroke-linecap="round" stroke-linejoin="round"/>
+`;
+        }
+      }
+    }
+
+    svg += `  </g>
+`;
+  }
+
+  svg += `</svg>`;
+
+  const blob = new Blob([svg], { type: "image/svg+xml" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ffito-${Date.now()}.ffito.svg`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 // ══════════════════════════════════════════════════════════════════════════
 // Composable
 // ══════════════════════════════════════════════════════════════════════════
