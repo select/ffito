@@ -12,7 +12,7 @@ import { pathToPolygon } from "~/utils/svgPath";
 
 export type ToolMode = "select" | "node";
 export type ViewMode = "hatch" | "original";
-export type GroupBy = "flat" | "color" | "group";
+export type GroupBy = "color" | "group";
 
 // ── Hatch layer ───────────────────────────────────────────────────────────
 
@@ -151,7 +151,9 @@ const viewMode = ref<ViewMode>("hatch");
 // Canvas navigation settings
 const panSpeed = ref(1.0);
 const zoomFactor = ref(1.12);
-const groupBy = ref<GroupBy>("flat");
+/** Current canvas zoom level — synced by HatchCanvas */
+const canvasZoom = ref(1);
+const groupBy = ref<GroupBy>("color");
 const svgSource = ref<string | null>(null);
 const svgViewBox = ref({ x: 0, y: 0, w: 800, h: 600 });
 const svgWidthMM = ref(210);
@@ -218,17 +220,6 @@ const uniqueGroups = computed(() => {
 });
 
 const groupedShapes = computed<ShapeGroup[]>(() => {
-  if (groupBy.value === "flat") {
-    return [{
-      key: "__all__",
-      label: "All Shapes",
-      swatch: "",
-      swatches: [],
-      icon: "i-mdi-layers-triple-outline",
-      shapes: [...shapes],
-    }];
-  }
-
   if (groupBy.value === "color") {
     const merges = colorMerges.value;
     const map = new Map<string, SvgShape[]>();
@@ -761,6 +752,7 @@ export const useFfitoStore = () => ({
   viewMode,
   panSpeed,
   zoomFactor,
+  canvasZoom,
   groupBy,
   svgSource,
   svgViewBox,

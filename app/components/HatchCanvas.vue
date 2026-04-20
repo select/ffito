@@ -15,11 +15,22 @@ import type { SvgShape } from "~/composables/useFfitoStore";
 const store = useFfitoStore();
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 
-const { transform, onPointerDown, onPointerMove, onPointerUp, panning, fitToView, canvasToSvg } =
+const { transform, onPointerDown, onPointerMove, onPointerUp, panning, applyZoom, fitToView, canvasToSvg } =
   useCanvasTransform(canvasRef, {
     panSpeed: store.panSpeed,
     zoomFactor: store.zoomFactor,
   });
+
+// Sync canvas zoom level to store so toolbar can read/set it
+watch(() => transform.value.scale, (s) => { store.canvasZoom.value = s; });
+
+// Allow toolbar to set zoom level (zoom toward canvas center)
+watch(store.canvasZoom, (newZoom) => {
+  if (Math.abs(newZoom - transform.value.scale) < 0.0001) return;
+  const cx = canvasSize.value.w / 2;
+  const cy = canvasSize.value.h / 2;
+  applyZoom(newZoom / transform.value.scale, cx, cy);
+});
 
 // ── Resize handling ───────────────────────────────────────────────────────
 

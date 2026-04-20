@@ -93,23 +93,24 @@ export function useCanvasTransform(
     const mx = e.clientX - rect.left;
     const my = e.clientY - rect.top;
 
-    if (e.shiftKey) {
-      // Shift+scroll → pan horizontally (deltaY becomes X)
+    if (e.ctrlKey || e.metaKey) {
+      // Ctrl+scroll (or trackpad pinch) → zoom around cursor
+      const factor = e.deltaY < 0 ? zoomFactorRef.value : 1 / zoomFactorRef.value;
+      applyZoom(factor, mx, my);
+    } else if (e.shiftKey) {
+      // Shift+scroll → pan horizontally
       const dx = e.deltaX !== 0 ? e.deltaX : e.deltaY;
-      const dy = e.deltaX !== 0 ? e.deltaY : 0;
       transform.value = {
         ...transform.value,
         x: transform.value.x - dx * panSpeedRef.value,
-        y: transform.value.y - dy * panSpeedRef.value,
       };
-    } else if (e.ctrlKey || e.metaKey) {
-      // Ctrl+scroll → zoom (also catches trackpad pinch which sends ctrlKey)
-      const factor = e.deltaY < 0 ? zoomFactorRef.value : 1 / zoomFactorRef.value;
-      applyZoom(factor, mx, my);
     } else {
-      // Plain scroll → zoom around cursor (Inkscape default)
-      const factor = e.deltaY < 0 ? zoomFactorRef.value : 1 / zoomFactorRef.value;
-      applyZoom(factor, mx, my);
+      // Plain scroll → pan vertically (+ horizontal tilt-wheel)
+      transform.value = {
+        ...transform.value,
+        x: transform.value.x - e.deltaX * panSpeedRef.value,
+        y: transform.value.y - e.deltaY * panSpeedRef.value,
+      };
     }
   }
 

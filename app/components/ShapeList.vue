@@ -141,21 +141,12 @@ function groupAnyVisible(g: ShapeGroup): boolean {
 
         <!-- Fold/unfold all -->
         <button
-          v-if="store.groupBy.value !== 'flat' && store.groupedShapes.value.length > 1"
+          v-if="store.groupedShapes.value.length > 1"
           class="clay-btn !w-6 !h-6 !rounded-lg"
           :title="allCollapsed ? 'Expand all groups' : 'Collapse all groups'"
           @click="toggleAllCollapsed"
         >
           <i :class="allCollapsed ? 'i-mdi-unfold-more-horizontal' : 'i-mdi-unfold-less-horizontal'" class="text-xs" />
-        </button>
-
-        <button
-          class="clay-btn !w-6 !h-6 !rounded-lg"
-          :class="store.groupBy.value === 'flat' && 'clay-btn-on'"
-          title="Flat list"
-          @click="store.groupBy.value = 'flat'"
-        >
-          <i class="i-mdi-format-list-bulleted text-xs" />
         </button>
         <button
           class="clay-btn !w-6 !h-6 !rounded-lg"
@@ -186,7 +177,6 @@ function groupAnyVisible(g: ShapeGroup): boolean {
 
       <!-- ── Group header ──────────────────────────────────────── -->
       <div
-        v-if="store.groupBy.value !== 'flat'"
         class="group/header relative flex items-center gap-1.5 px-1.5 h-[24px] rounded-lg transition-all duration-200 select-none"
         :class="[
           // Selection state
@@ -292,8 +282,7 @@ function groupAnyVisible(g: ShapeGroup): boolean {
       <!-- ── Expanded: shape list ──────────────────────────────── -->
       <div
         v-if="!store.collapsedGroups.value.has(group.key)"
-        class="flex flex-col"
-        :class="store.groupBy.value !== 'flat' ? 'ml-2 pl-2 border-l border-[rgb(var(--border))]' : ''"
+        class="flex flex-col ml-2 pl-2 border-l border-[rgb(var(--border))]"
       >
         <ShapeItem
           v-for="shape in group.shapes"
@@ -307,7 +296,7 @@ function groupAnyVisible(g: ShapeGroup): boolean {
 
       <!-- ── Collapsed: selected sub-list only ─────────────────── -->
       <div
-        v-else-if="store.groupBy.value !== 'flat' && isPartial(group)"
+        v-else-if="isPartial(group)"
         class="ml-2 pl-2 border-l border-[rgb(var(--border))]"
       >
         <div class="flex items-center gap-1.5 px-1.5 h-[22px]">
